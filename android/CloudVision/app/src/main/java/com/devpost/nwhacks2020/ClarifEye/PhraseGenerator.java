@@ -1,7 +1,8 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
-
+import com.google.api.services.vision.v1.model.EntityAnnotation;
+import com.google.api.services.vision.v1.model.LocalizedObjectAnnotation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,10 +94,12 @@ public class PhraseGenerator {
      * @param annotateImageResponse response from google cloud API
      * @return ArrayList of objects in the photo
      */
-    private static List<item> convertJSONtoitem(AnnotateImageResponse annotateImageResponse){
+    private static List<item> convertJSONtoitem(AnnotateImageResponse response){
         List<item> objects = new ArrayList<item>();
 
         //TODO: parse JSON file
+        List<EntityAnnotation> labels = response.getLabelAnnotations();
+        List<LocalizedObjectAnnotation> local_obj = response.getLocalizedObjectAnnotation();
         return objects;
     }
 
