@@ -29,6 +29,8 @@ import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -50,11 +53,37 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mImageDetails;
     private ImageView mMainImage;
+    private TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        tts=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    int result = tts.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(MainActivity.this,
+                                "This Language is not supported", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        Toast.makeText(MainActivity.this,
+                                "Text-To-Speech engine is initialized", Toast.LENGTH_LONG).show();
+                    }
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"Text To Speech is not supported on your device",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -140,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                                 MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
                                 MAX_DIMENSION);
 
-                callCloudVision(bitmap);
+                speakImage(bitmap);
                 mMainImage.setImageBitmap(bitmap);
 
             } catch (IOException e) {
@@ -153,8 +182,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void callCloudVision(Bitmap b) {
+    private void speakImage(Bitmap b) {
         VisionRequestor.callCloudVision(b,this);
+        String phrase = PhraseGenerator.generatePhrase();
+        tts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
@@ -175,6 +206,10 @@ public class MainActivity extends AppCompatActivity {
             resizedWidth = maxDimension;
         }
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
+    }
+
+    public void onPause(){
+        super.onPause();
     }
 
 }
