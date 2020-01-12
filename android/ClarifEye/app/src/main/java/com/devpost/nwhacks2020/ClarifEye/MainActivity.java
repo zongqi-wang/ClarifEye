@@ -133,10 +133,12 @@ public class MainActivity extends AppCompatActivity {
             case DESCRIBE:
                 modeText.setText("Describe Image");
                 speak("Describe Image");
+                vibrate();
                 break;
             case READ:
                 modeText.setText("Read Document");
                 speak("Read Document");
+                vibrate();
                 break;
         }
     }
