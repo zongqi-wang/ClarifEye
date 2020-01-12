@@ -211,6 +211,10 @@ public class PhraseGenerator {
         JsonObject parsedResponse = (JsonObject) r;
         JsonArray  annotations = (JsonArray) parsedResponse.get("localizedObjectAnnotations");
 
+        if(annotations == null) {
+            return objects;
+        }
+
         for(JsonElement a : annotations)
         {
             JsonObject annotation = a.getAsJsonObject();
@@ -224,11 +228,17 @@ public class PhraseGenerator {
             JsonObject boundingPoly = annotation.get("boundingPoly").getAsJsonObject();
             JsonArray verts = boundingPoly.get("normalizedVertices").getAsJsonArray();
 
-            int i = 0;
-            for(JsonElement vert : verts) {
-                JsonObject vertice = (JsonObject) vert;
-                vertices[0][i] = vertice.get("x").getAsDouble();
-                vertices[1][i] = vertice.get("y").getAsDouble();
+            try {
+                int i = 0;
+                for (JsonElement vert : verts) {
+                    JsonObject vertice = (JsonObject) vert;
+                    vertices[0][i] = vertice.get("x").getAsDouble();
+                    vertices[1][i] = vertice.get("y").getAsDouble();
+                    //TODO I think you need a i++; here
+                }
+            }
+            catch (NullPointerException e) {
+                continue;
             }
 
             double[] sides = new double[4];
