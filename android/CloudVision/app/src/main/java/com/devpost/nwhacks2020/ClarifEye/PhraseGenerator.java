@@ -1,10 +1,13 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.LocalizedObjectAnnotation;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.simple.parser.*;
 
 public class PhraseGenerator {
     private static String[] prepPhrases = {
