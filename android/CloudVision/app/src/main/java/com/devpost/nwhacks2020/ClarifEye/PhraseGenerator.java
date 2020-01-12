@@ -22,8 +22,7 @@ public class PhraseGenerator {
      */
     protected class item{
         private String name;
-        private int x;
-        private int y;
+        private int[][] vertices; //no tuples in Java :(. First array is x, y coordinates, second is each point in normalizedVertices
         private int prob;
         private int rel_imp;
 
@@ -39,15 +38,14 @@ public class PhraseGenerator {
         /**
          *
          * @param name label of the object
-         * @param x x position
-         * @param y y position
+         * @param vertices four given vertices
          * @param prob probability score
          */
-        public item(String name, int x, int y, int prob){
+        public item(String name, int[][] vertices, int prob){
             this.name = name;
-            this.x = x;
-            this.y = y;
+            this.vertices = vertices;
             this.prob = prob;
+            setRel_imp();
         }
 
         /**
