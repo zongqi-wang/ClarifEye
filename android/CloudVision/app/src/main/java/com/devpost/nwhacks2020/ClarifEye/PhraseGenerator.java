@@ -1,7 +1,10 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
+import org.json.simple.parser.*;
 
 public class PhraseGenerator {
     private String[] prepPhrases = {
@@ -27,7 +30,9 @@ public class PhraseGenerator {
     }
 
     public static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
-        return "";
+
+        // typecasting obj to JSONObject
+        return "Error";
     }
 
     public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {

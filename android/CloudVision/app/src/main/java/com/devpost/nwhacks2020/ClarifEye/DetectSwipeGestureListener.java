@@ -62,6 +62,7 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
             }else
             {
                 // Swipe down
+                activity.silence();
             }
         }
 

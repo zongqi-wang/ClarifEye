@@ -17,18 +17,20 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.VibrationEffect;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
+import android.os.Vibrator;
 
 import com.camerakit.CameraKitView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.api.services.vision.v1.model.Image;
-
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetectorCompat gestureDetectorCompat;
     private VisionRequestor.Mode mode = VisionRequestor.Mode.DESCRIBE;
     private CameraKitView cameraKitView;
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         cameraKitView = findViewById(R.id.camera);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
 
         tts=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -118,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void silence() {
+        tts.stop();
+    }
 
     public void setMode(VisionRequestor.Mode m) {
         mode = m;
@@ -209,6 +216,16 @@ public class MainActivity extends AppCompatActivity {
         VisionRequestor.callCloudVision(imageBytes,this, tts, mode);
     }
 
+    private void vibrate() {
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            vibrator.vibrate(500);
+        }
+    }
+
     public void speak(String text) {
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
@@ -234,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void takePhoto() {
+        vibrate();
         cameraKitView.captureImage(new  CameraKitView.ImageCallback() {
             @Override
             public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
