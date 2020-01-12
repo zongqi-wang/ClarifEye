@@ -137,28 +137,28 @@ public class PhraseGenerator {
             //and
             scores[0] = 0.5;
             //above
-//            if(topic.sides.bottom < adjunct.sides.top)
-//                scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
-//            //below
-//            if(topic.sides.top > adjunct.sides.bottom)
-//                scores[2] = 1 - (adjunct.sides.bottom - topic.sides.top);
-//            // to the left of
-//            if(topic.sides.right < adjunct.sides.left)
-//                scores[3] = 1 - (adjunct.sides.left - topic.sides.right);
-//            //to the right of
-//            if(topic.sides.left > adjunct.sides.right)
-//                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
+            if(topic.sides.bottom < adjunct.sides.top)
+                scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
+            //below
+            if(topic.sides.top > adjunct.sides.bottom)
+                scores[2] = 1 - (adjunct.sides.bottom - topic.sides.top);
+            // to the left of
+            if(topic.sides.right < adjunct.sides.left)
+                scores[3] = 1 - (adjunct.sides.left - topic.sides.right);
+            //to the right of
+            if(topic.sides.left > adjunct.sides.right)
+                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
 
-            //above
-            if(adjunct.get_center(false) > topic.get_center(false))
-                scores[1] = 1 - (adjunct.get_center(false) - topic.get_center(false));
-            else
-                scores[2] = 1 - (topic.get_center(false) - adjunct.get_center(false));
-            //left
-            if(adjunct.get_center(true) > topic.get_center(true))
-                scores[3] = 1 - (adjunct.get_center(true) - topic.get_center(true));
-            else
-                scores[4] = 1 - (topic.get_center(true) - adjunct.get_center(true));
+//            //above
+//            if(adjunct.get_center(false) > topic.get_center(false))
+//                scores[1] = 1 - (adjunct.get_center(false) - topic.get_center(false));
+//            else
+//                scores[2] = 1 - (topic.get_center(false) - adjunct.get_center(false));
+//            //left
+//            if(adjunct.get_center(true) > topic.get_center(true))
+//                scores[3] = 1 - (adjunct.get_center(true) - topic.get_center(true));
+//            else
+//                scores[4] = 1 - (topic.get_center(true) - adjunct.get_center(true));
 
 
             int topscore = 0;
@@ -280,7 +280,7 @@ public class PhraseGenerator {
 
     private String buildPhrase(List<Item> objects, List<PrepositionPair> ppairs) {
 
-        System.out.println("# of objects = " + objects.size());
+        System.out.println("# of objects = " + objects.size()); //TODO: remove these
         System.out.println("# of ppairs = " + ppairs.size());
 
         if(objects.size() == 0) {
@@ -289,12 +289,12 @@ public class PhraseGenerator {
         else if (objects.size() == 1) {
             return "There is a " + objects.get(0).name;
         }
-        else {
-            List<PrepositionPair> pps = new ArrayList<PrepositionPair>();
-            for(int i = 0; i < objects.size(); i++) {
+        else {  //more than one object
+            List<PrepositionPair> pps = new ArrayList<>();
+            for(int i = 0; i < objects.size(); i++) { //for each object
                 int topP = 0;
                 boolean found = false;
-                for(int p = 0; p < ppairs.size(); p++) {
+                for(int p = 0; p < ppairs.size(); p++) { //for each pair of objects
                     if(ppairs.get(p).topic.name.equals(objects.get(i).name) || ppairs.get(p).adjunct.name.equals(objects.get(i).name)) {
                         if(!found) {
                             topP = p;
@@ -312,6 +312,7 @@ public class PhraseGenerator {
                 }
             }
             String phrase = "";
+            boolean useAnd = true;
             for(int i = 0; i < objects.size(); i++) {
                 String tempPhrase = "There is a " + objects.get(i).name;
                 boolean topic = false;
@@ -327,12 +328,23 @@ public class PhraseGenerator {
                     }
 
                 }
-                tempPhrase = tempPhrase + ". ";
                 if(topic) {
+                    if(useAnd)
+                    {
+                        tempPhrase = tempPhrase + " and ";
+                        useAnd = false;
+                    }
+                    else {
+                        tempPhrase = tempPhrase + ". ";
+                        useAnd = true;
+                    }
                     phrase = phrase + tempPhrase;
                 }
             }
-            System.out.println(phrase);
+            System.out.println(phrase); //TODO: remove this
+            if(phrase.subSequence((phrase.length()-5), phrase.length()).equals(" and ")) {
+                phrase = phrase = phrase.substring(0, phrase.length()-5) + ". ";
+            }
             return phrase;
         }
     }
