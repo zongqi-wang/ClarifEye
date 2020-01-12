@@ -114,7 +114,8 @@ public class VisionRequestor {
 
         BatchAnnotateImagesRequest batchAnnotateImagesRequest =
                 new BatchAnnotateImagesRequest();
-        batchAnnotateImagesRequest.setRequests(new ArrayList<AnnotateImageRequest>() {{
+        batchAnnotateImagesRequest.setRequests(
+                new ArrayList<AnnotateImageRequest>() {{
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
 
             // Add the image
@@ -130,16 +131,25 @@ public class VisionRequestor {
             annotateImageRequest.setImage(base64EncodedImage);
 
             // add the features we want
-            annotateImageRequest.setFeatures(new ArrayList<Feature>() {{
-                Feature labelDetection = new Feature();
-                labelDetection.setType("LABEL_DETECTION");
-                labelDetection.setMaxResults(MAX_LABEL_RESULTS);
-                add(labelDetection);
-            }});
+
+                    ArrayList<Feature> features = new ArrayList<Feature>();
+
+                    Feature labelDetection = new Feature();
+                    labelDetection.setType("LABEL_DETECTION");
+                    labelDetection.setMaxResults(MAX_LABEL_RESULTS);
+                    features.add(labelDetection);
+
+                    Feature objectDetection = new Feature();
+                    objectDetection.setType("OBJECT_LOCALIZATION");
+                    objectDetection.setMaxResults(MAX_LABEL_RESULTS);
+                    features.add(objectDetection);
+
+            annotateImageRequest.setFeatures(features);
 
             // Add the list of one thing to the request
             add(annotateImageRequest);
-        }});
+        }}
+        );
 
         Vision.Images.Annotate annotateRequest =
                 vision.images().annotate(batchAnnotateImagesRequest);
@@ -152,6 +162,8 @@ public class VisionRequestor {
 
     private static String convertResponseToString(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder("I found these things:\n\n");
+
+        Log.d("VISION",response.getResponses().toString());
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
         if (labels != null) {
