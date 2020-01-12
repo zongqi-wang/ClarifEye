@@ -336,14 +336,5 @@ public class PhraseGenerator {
             return phrase;
         }
     }
-
-
-    //build_preposition_pairs ( Item[] ) > PrepositionPair[]
-    //foreach i in Item.length
-    //new PrepositionPhrase(Item[i], Item[i+1])
-
-    //build_string(Item[], PrepositionPair[])
-    //foreach(Item[])
-    //get best PrepositionPair with Item[i]
 }
 
