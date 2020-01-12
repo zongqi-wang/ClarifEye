@@ -13,6 +13,23 @@ public class PhraseGenerator {
     };
 
     public static String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
-        return "This is a test of the Clarify app.";
+        String phrase = "This is a test of the Clarify app.";
+        switch (mode) {
+            case DESCRIBE:
+                phrase = generatePhraseDescribe(annotateImageResponse);
+                break;
+            case READ:
+                phrase = generatePhraseRead(annotateImageResponse);
+                break;
+        }
+        return phrase;
+    }
+
+    public static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
+        return "";
+    }
+    
+    public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
+        return "";
     }
 }
