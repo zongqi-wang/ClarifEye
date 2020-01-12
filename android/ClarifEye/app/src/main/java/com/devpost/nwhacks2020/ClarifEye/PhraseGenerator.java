@@ -178,7 +178,9 @@ public class PhraseGenerator {
 
         sortObjects(objects);
 
-        List<PrepositionPair> ppairs = build_preposition_pairs((Item[])objects.toArray());
+        Item[] temp = new Item[objects.size()];
+        temp = objects.toArray(temp);
+        List<PrepositionPair> ppairs = build_preposition_pairs(temp);
 
         return buildPhrase(objects, ppairs);
     }
@@ -233,7 +235,7 @@ public class PhraseGenerator {
                     JsonObject vertice = (JsonObject) vert;
                     vertices[0][i] = vertice.get("x").getAsDouble();
                     vertices[1][i] = vertice.get("y").getAsDouble();
-                    //TODO I think you need a i++; here
+                    i++;
                 }
             }
             catch (NullPointerException e) {
@@ -263,6 +265,10 @@ public class PhraseGenerator {
     }
 
     private String buildPhrase(List<Item> objects, List<PrepositionPair> ppairs) {
+
+        System.out.println("# of objects = " + objects.size());
+        System.out.println("# of ppairs = " + ppairs.size());
+
         if(objects.size() == 0) {
             return "No objects recognized.";
         }
@@ -270,8 +276,32 @@ public class PhraseGenerator {
             return "There is a " + objects.get(0).name;
         }
         else {
+            List<PrepositionPair> pps = new ArrayList<PrepositionPair>();
+            for(int i = 0; i < objects.size(); i++) {
+                int topP = 0;
+                boolean found = false;
+                for(int p = 0; p < ppairs.size(); p++) {
+                    if(ppairs.get(p).topic.name.equals(objects.get(i).name) || ppairs.get(p).adjunct.name.equals(objects.get(i).name)) {
+                        if(!found) {
+                            topP = p;
+                            found = true;
+                        }
+                        else if (ppairs.get(p).score > ppairs.get(topP).score) {
+                            topP = p;
+                        }
+                    }
+                }
+                if (found) {
+                    if(!pps.contains(ppairs.get(topP))) {
+                        pps.add(ppairs.get(topP));
+                    }
+                }
+            }
             String phrase = "";
-            //TODO
+            for(int j = 0; j < pps.size(); j++) {
+                phrase = phrase + "There is a " + pps.get(j).topic.name + prepPhrases[pps.get(j).prepositionIndex] + "a " + pps.get(j).adjunct.name + ". ";
+            }
+            System.out.println(phrase);
             return phrase;
         }
     }
