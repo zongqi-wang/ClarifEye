@@ -51,7 +51,7 @@ public class PhraseGenerator {
          */
         private void setRel_imp() {
             double centering = calculate_center(vertices);
-            double area = calculate_area(vertices); 
+            double area = calculate_area(vertices);
             this.rel_imp = centering * area;
         }
 
@@ -84,6 +84,21 @@ public class PhraseGenerator {
         }
     }
 
+    /**
+     * used to store best guess of a relationship between two objects
+     */
+    private class prepositionPair {
+        private int prepositionIndex; //index in prepPhrases array
+        private item adjunct;     //index in objects array
+        private item subject;     //index in objects array TODO: rename variable
+        private double score;     //confidence in appropriateness of prepositional phrase
+
+        private prepositionPair() {
+
+
+
+        }
+    }
 
     public static String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
         String phrase = "This is a test of the Clarify app.";
@@ -136,17 +151,6 @@ public class PhraseGenerator {
         return objects;
     }
 
-
-    private class prepositionPair {
-        private prepositionPair() {
-            int prepositionIndex;
-            int adjunctIndex;
-            int subjectIndex; //rename variable
-            double score;
-
-            //overload comparison
-        }
-    }
 
     // create_objects (AnnotateImageResponse > item[])
 
