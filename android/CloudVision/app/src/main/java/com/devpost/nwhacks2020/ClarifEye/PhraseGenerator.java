@@ -1,13 +1,15 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import com.google.api.services.vision.v1.model.EntityAnnotation;
-import com.google.api.services.vision.v1.model.LocalizedObjectAnnotation;
+
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.json.simple.parser.*;
 
 public class PhraseGenerator {
     private static String[] prepPhrases = {
@@ -24,7 +26,7 @@ public class PhraseGenerator {
     /**
      * used to store objects in image
      */
-    protected class item {
+    protected static class item {
         private String name;
         private double[][] vertices; //no tuples in Java :(. First array is x, y coordinates, second is each point in normalizedVertices
         private double prob;
@@ -142,15 +144,34 @@ public class PhraseGenerator {
     /**
      * This function converts the API returned JSON function into a list of item objects
      *
-     * @param annotateImageResponse response from google cloud API
+     * @param annotateImageResponse response from google cloud API TODO: update documentation
      * @return ArrayList of objects in the photo
      */
     private static List<item> convertJSONtoitem(AnnotateImageResponse response){
         List<item> objects = new ArrayList<item>();
 
-        //TODO: parse JSON file
-        List<EntityAnnotation> labels = response.getLabelAnnotations();
-        List<LocalizedObjectAnnotation> local_obj = response.getLocalizedObjectAnnotation();
+        Object r = new JsonParser().parse(response.toString());
+        JsonObject parsedResponse = (JsonObject) r;
+        JsonArray  annotations = (JsonArray) parsedResponse.get("localizedObjectAnnotations");
+
+        for(JsonElement a : annotations)
+        {
+            JsonObject annotation = a.getAsJsonObject();
+            String name = annotation.get("name").getAsString();
+            double score = annotation.get("score").getAsDouble();
+            double[][] vertices = new double[2][];
+            JsonObject boundingPoly = annotation.get("boundingPoly").getAsJsonObject();
+            JsonArray verts = boundingPoly.get("normalizedVertices").getAsJsonArray();
+            int i = 0;
+            for(JsonElement vert : verts) {
+                JsonObject vertice = (JsonObject) vert;
+                vertices[0][i] = vertice.get("x").getAsDouble();
+                vertices[1][i] = vertice.get("y").getAsDouble();
+            }
+
+            item newItem = new item(name, vertices, score);
+            objects.add(newItem);
+        }
         return objects;
     }
 
