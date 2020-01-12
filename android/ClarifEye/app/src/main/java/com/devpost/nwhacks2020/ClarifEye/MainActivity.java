@@ -90,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
                                 "This Language is not supported", Toast.LENGTH_LONG).show();
                     }
                     else {
-                        Toast.makeText(MainActivity.this,
-                                "Text-To-Speech engine is initialized", Toast.LENGTH_LONG).show();
+                        /*Toast.makeText(MainActivity.this,
+                                "Text-To-Speech engine is initialized", Toast.LENGTH_LONG).show();*/
                     }
                 }
                 else{
