@@ -2,9 +2,12 @@ package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
+<<<<<<< HEAD
 import com.google.api.services.vision.v1.model.LocalizedObjectAnnotation;
 import java.util.ArrayList;
 import java.util.List;
+=======
+>>>>>>> e851385cb3a148f50a8c58c637a5f489fbecc2f4
 
 public class PhraseGenerator {
     private static String[] prepPhrases = {
@@ -110,6 +113,10 @@ public class PhraseGenerator {
         return "This is a test of the Clarify app.";
     }
 
+<<<<<<< HEAD
+    private static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
+        return "";
+=======
     public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
         if(annotateImageResponse.getTextAnnotations() != null) {
             String phrase = annotateImageResponse.getTextAnnotations().get(0).getDescription().replaceAll("\n", " ");
@@ -119,6 +126,7 @@ public class PhraseGenerator {
         else {
             return "No text detected.";
         }
+>>>>>>> e851385cb3a148f50a8c58c637a5f489fbecc2f4
     }
 
     /**

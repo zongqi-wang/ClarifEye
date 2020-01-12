@@ -110,15 +110,8 @@ public class PhraseGenerator {
         return "This is a test of the Clarify app.";
     }
 
-    public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
-        if(annotateImageResponse.getTextAnnotations() != null) {
-            String phrase = annotateImageResponse.getTextAnnotations().get(0).getDescription().replaceAll("\n", " ");
-            System.out.println(phrase);
-            return phrase;
-        }
-        else {
-            return "No text detected.";
-        }
+    private static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
+        return "";
     }
 
     /**

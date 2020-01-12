@@ -44,11 +44,11 @@ public class VisionRequestor {
 
     private static TextToSpeech tts;
 
-    public static void callCloudVision(final Bitmap bitmap, Activity activity, TextToSpeech t, Mode m) {
+    public static void callCloudVision(final byte[] image, Activity activity, TextToSpeech t, Mode m) {
         tts = t;
         // Do the real work in an async task, because we need to use the network anyway
         try {
-            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(bitmap, activity, m),m);
+            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(image, activity, m),m);
             labelDetectionTask.execute();
         } catch (IOException e) {
             Log.d(TAG, "failed to make API request because of other IOException " +
@@ -86,13 +86,12 @@ public class VisionRequestor {
         protected void onPostExecute(String result) {
             Activity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                TextView imageDetail = activity.findViewById(R.id.image_details);
-                imageDetail.setText(result);
+
             }
         }
     }
 
-    private static Vision.Images.Annotate prepareAnnotationRequest(Bitmap bitmap, Context context, Mode mode) throws IOException {
+    private static Vision.Images.Annotate prepareAnnotationRequest(byte[] imageBytes, Context context, Mode mode) throws IOException {
         HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
@@ -127,13 +126,7 @@ public class VisionRequestor {
                 new ArrayList<AnnotateImageRequest>() {{
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
 
-            // Add the image
             Image base64EncodedImage = new Image();
-            // Convert the bitmap to a JPEG
-            // Just in case it's a format that Android understands but Cloud Vision
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-            byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
             // Base64 encode the JPEG
             base64EncodedImage.encodeContent(imageBytes);
