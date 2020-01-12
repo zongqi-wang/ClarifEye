@@ -135,7 +135,7 @@ public class PhraseGenerator {
             for(double s : scores)
                 s = 0;
             //and
-            scores[0] = 0.4;
+            scores[0] = 0.5;
             //above
 //            if(topic.sides.bottom < adjunct.sides.top)
 //                scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
@@ -149,16 +149,16 @@ public class PhraseGenerator {
 //            if(topic.sides.left > adjunct.sides.right)
 //                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
 
-            //bottom
-            if(topic.get_center(false) < adjunct.get_center(false))
+            //above
+            if(topic.get_center(false) > adjunct.get_center(false))
                 scores[1] = 1 - (topic.get_center(false) - adjunct.get_center(false));
             else
                 scores[2] = 1 - (adjunct.get_center(false) - topic.get_center(false));
             //left
             if(topic.get_center(true) < adjunct.get_center(true))
-                scores[3] = 1 - (topic.get_center(true) - adjunct.get_center(true));
+                scores[3] = 1 - (adjunct.get_center(true) - topic.get_center(true));
             else
-                scores[4] = 1 - (adjunct.get_center(true) - topic.get_center(true));
+                scores[4] = 1 - (topic.get_center(true) - adjunct.get_center(true));
 
 
             int topscore = 0;
