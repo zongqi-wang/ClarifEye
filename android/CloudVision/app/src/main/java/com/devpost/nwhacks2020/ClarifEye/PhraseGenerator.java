@@ -1,5 +1,7 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
+import com.google.api.services.vision.v1.model.AnnotateImageResponse;
+
 public class PhraseGenerator {
     private String[] prepPhrases = {
         " and ", //generic
@@ -10,7 +12,7 @@ public class PhraseGenerator {
         " behind "       //distinguish from above
     };
 
-    public static String generatePhrase() {
+    public static String generatePhrase(AnnotateImageResponse annotateImageResponse) {
         return "This is a test of the Clarify app.";
     }
 }
