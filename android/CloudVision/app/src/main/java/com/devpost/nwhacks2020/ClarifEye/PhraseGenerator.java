@@ -9,5 +9,8 @@ public class PhraseGenerator {
         " in front of ", //distinguish from below
         " behind "       //distinguish from above
     };
-}
 
+    public static String generatePhrase() {
+        return "This is a test of the Clarify app.";
+    }
+}
