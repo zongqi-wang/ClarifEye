@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.google.sample.cloudvision"
+        applicationId "com.devpost.nwhacks2020.ClarifEye"
         minSdkVersion 24
         targetSdkVersion 27
         versionCode 1
