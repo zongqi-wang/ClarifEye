@@ -180,8 +180,7 @@ public class PhraseGenerator {
 
         List<PrepositionPair> ppairs = build_preposition_pairs((Item[])objects.toArray());
 
-        // return build_string(objects, ppairs)
-        return "This is a test of the Clarify app.";
+        return buildPhrase(objects, ppairs);
     }
 
     private static void sortObjects(List<Item> objects){
@@ -262,6 +261,21 @@ public class PhraseGenerator {
         }
         return pairs;
     }
+
+    private String buildPhrase(List<Item> objects, List<PrepositionPair> ppairs) {
+        if(objects.size() == 0) {
+            return "No objects recognized.";
+        }
+        else if (objects.size() == 1) {
+            return "There is a " + objects.get(0).name;
+        }
+        else {
+            String phrase = "";
+            //TODO
+            return phrase;
+        }
+    }
+
 
     //build_preposition_pairs ( Item[] ) > PrepositionPair[]
     //foreach i in Item.length
