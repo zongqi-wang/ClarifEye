@@ -49,9 +49,9 @@ public class PhraseGenerator {
          * calculates the relative importance of this function
          */
         private void setRel_imp() {
-            double center = calculate_center(vertices);
-            double area = 1; //calculate_area(); TODO:
-            this.rel_imp = center * area;
+            double centering = calculate_center(vertices);
+            double area = calculate_area(vertices); 
+            this.rel_imp = centering * area;
         }
 
         /**
@@ -71,6 +71,15 @@ public class PhraseGenerator {
                 sum += dimsum / dim.length;
             }
             return sum / verts.length;
+        }
+
+        /**
+         * calculates the area covered by a plane spread between the given vertices
+         * @param verts
+         * @return
+         */
+        private double calculate_area(double[][] verts) {
+            return 1; //TODO:
         }
     }
 
