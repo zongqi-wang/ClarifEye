@@ -99,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
         mImageDetails = findViewById(R.id.image_details);
         mMainImage = findViewById(R.id.main_image);
+
+        startCamera();
     }
 
     public void startGalleryChooser() {
