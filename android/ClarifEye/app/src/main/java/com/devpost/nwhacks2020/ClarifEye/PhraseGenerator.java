@@ -280,7 +280,7 @@ public class PhraseGenerator {
 
     private String buildPhrase(List<Item> objects, List<PrepositionPair> ppairs) {
 
-        System.out.println("# of objects = " + objects.size());
+        System.out.println("# of objects = " + objects.size()); //TODO: remove these
         System.out.println("# of ppairs = " + ppairs.size());
 
         if(objects.size() == 0) {
@@ -289,12 +289,12 @@ public class PhraseGenerator {
         else if (objects.size() == 1) {
             return "There is a " + objects.get(0).name;
         }
-        else {
-            List<PrepositionPair> pps = new ArrayList<PrepositionPair>();
-            for(int i = 0; i < objects.size(); i++) {
+        else {  //more than one object
+            List<PrepositionPair> pps = new ArrayList<>();
+            for(int i = 0; i < objects.size(); i++) { //for each object
                 int topP = 0;
                 boolean found = false;
-                for(int p = 0; p < ppairs.size(); p++) {
+                for(int p = 0; p < ppairs.size(); p++) { //for each pair of objects
                     if(ppairs.get(p).topic.name.equals(objects.get(i).name) || ppairs.get(p).adjunct.name.equals(objects.get(i).name)) {
                         if(!found) {
                             topP = p;
@@ -312,6 +312,7 @@ public class PhraseGenerator {
                 }
             }
             String phrase = "";
+            boolean useAnd = true;
             for(int i = 0; i < objects.size(); i++) {
                 String tempPhrase = "There is a " + objects.get(i).name;
                 boolean topic = false;
@@ -327,12 +328,23 @@ public class PhraseGenerator {
                     }
 
                 }
-                tempPhrase = tempPhrase + ". ";
                 if(topic) {
+                    if(useAnd)
+                    {
+                        tempPhrase = tempPhrase + " and ";
+                        useAnd = false;
+                    }
+                    else {
+                        tempPhrase = tempPhrase + ". ";
+                        useAnd = true;
+                    }
                     phrase = phrase + tempPhrase;
                 }
             }
-            System.out.println(phrase);
+            System.out.println(phrase); //TODO: remove this
+            if(phrase.subSequence((phrase.length()-5), phrase.length()).equals(" and ")) {
+                phrase = phrase = phrase.substring(0, phrase.length()-5) + ". ";
+            }
             return phrase;
         }
     }
