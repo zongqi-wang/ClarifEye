@@ -135,19 +135,31 @@ public class PhraseGenerator {
             for(double s : scores)
                 s = 0;
             //and
-            scores[0] = 0.4;
+            scores[0] = 0.5;
             //above
-            if(topic.sides.bottom < adjunct.sides.top)
-                scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
-            //below
-            if(topic.sides.top > adjunct.sides.bottom)
-                scores[2] = 1 - (adjunct.sides.bottom - topic.sides.top);
-            // to the left of
-            if(topic.sides.right < adjunct.sides.left)
-                scores[3] = 1 - (adjunct.sides.left - topic.sides.right);
-            //to the right of
-            if(topic.sides.left > adjunct.sides.right)
-                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
+//            if(topic.sides.bottom < adjunct.sides.top)
+//                scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
+//            //below
+//            if(topic.sides.top > adjunct.sides.bottom)
+//                scores[2] = 1 - (adjunct.sides.bottom - topic.sides.top);
+//            // to the left of
+//            if(topic.sides.right < adjunct.sides.left)
+//                scores[3] = 1 - (adjunct.sides.left - topic.sides.right);
+//            //to the right of
+//            if(topic.sides.left > adjunct.sides.right)
+//                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
+
+            //above
+            if(topic.get_center(false) > adjunct.get_center(false))
+                scores[1] = 1 - (topic.get_center(false) - adjunct.get_center(false));
+            else
+                scores[2] = 1 - (adjunct.get_center(false) - topic.get_center(false));
+            //left
+            if(topic.get_center(true) < adjunct.get_center(true))
+                scores[3] = 1 - (adjunct.get_center(true) - topic.get_center(true));
+            else
+                scores[4] = 1 - (topic.get_center(true) - adjunct.get_center(true));
+
 
             int topscore = 0;
             for(int i = 1; i < scores.length; i++) {
@@ -155,8 +167,8 @@ public class PhraseGenerator {
                     topscore = i;
             }
 
-            score = scores[topscore];
-            prepositionIndex = topscore;
+            this.score = scores[topscore];
+            this.prepositionIndex = topscore;
         }
     }
 
