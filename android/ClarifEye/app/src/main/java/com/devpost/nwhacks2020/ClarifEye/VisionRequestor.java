@@ -181,7 +181,8 @@ public class VisionRequestor {
         System.out.println("CONVERT");
         StringBuilder message = new StringBuilder("I found these things:\n\n");
 
-        String phrase = PhraseGenerator.generatePhrase(response.getResponses().get(0), mode);
+        PhraseGenerator phraseGen= new PhraseGenerator();
+        String phrase = phraseGen.generatePhrase(response.getResponses().get(0), mode);
         System.out.println("PHRASE");
 
         tts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);

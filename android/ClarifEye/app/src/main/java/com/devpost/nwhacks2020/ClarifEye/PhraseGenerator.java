@@ -29,7 +29,7 @@ public class PhraseGenerator {
     /**
      * used to store objects in image
      */
-    protected static class Item implements Comparable<Item>{
+    protected class Item implements Comparable<Item>{
         protected class ItemSides{
             protected double top;
             protected double bottom;
@@ -119,7 +119,7 @@ public class PhraseGenerator {
     /**
      * used to store best guess of a relationship between two objects
      */
-    private static class PrepositionPair {
+    private class PrepositionPair {
         private int prepositionIndex; //index in prepPhrases array
         private Item adjunct;     //index in objects array
         private Item topic;     //index in objects array
@@ -159,7 +159,7 @@ public class PhraseGenerator {
         }
     }
 
-    public static String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
+    public String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
         String phrase = "Nothing has been detected.";
         switch (mode) {
             case DESCRIBE:
@@ -172,7 +172,7 @@ public class PhraseGenerator {
         return phrase;
     }
 
-    private static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
+    private String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
 
         List<Item> objects = convertJSONtoitem(annotateImageResponse);
 
@@ -204,7 +204,7 @@ public class PhraseGenerator {
      * @param response output from vision
      * @return
      */
-    private static List<Item> convertJSONtoitem(AnnotateImageResponse response){
+    private List<Item> convertJSONtoitem(AnnotateImageResponse response){
         List<Item> objects = new ArrayList<Item>();
 
         Object r = new JsonParser().parse(response.toString());
@@ -244,7 +244,7 @@ public class PhraseGenerator {
         return objects;
     }
 
-    private static List<PrepositionPair> build_preposition_pairs(Item[] objects) {
+    private List<PrepositionPair> build_preposition_pairs(Item[] objects) {
         List<PrepositionPair> pairs = new ArrayList<PrepositionPair>();
         for(int i = 0; i < objects.length; i++){
             for(int j = i + 1; j < objects.length; j++)
