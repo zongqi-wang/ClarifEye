@@ -313,8 +313,17 @@ public class PhraseGenerator {
             }
             String phrase = "";
             boolean and = true;
+            Item lastAdjunct = null;
+            boolean whichIs = false;
             for(int i = 0; i < objects.size(); i++) {
-                String tempPhrase = "There is a " + objects.get(i).name;
+                String tempPhrase = "";
+                if(whichIs) {
+                    tempPhrase = "which is ";
+                    whichIs = false;
+                }
+                else {
+                    tempPhrase = "There is a " + objects.get(i).name;
+                }
                 boolean topic = false;
                 for (int p = 0; p < pps.size(); p++) {
                     if (pps.get(p).topic.name.equals(objects.get(i).name)) {
@@ -325,20 +334,28 @@ public class PhraseGenerator {
                             topic = true;
                         }
                         tempPhrase = tempPhrase + prepPhrases[pps.get(p).prepositionIndex] + "a " + pps.get(p).adjunct.name;
+                        lastAdjunct = pps.get(p).adjunct;
+                        if(i != objects.size()-1 && objects.get(i+1).equals(lastAdjunct)) {
+                            whichIs = true;
+                        }
                     }
 
                 }
                 if(topic) {
-                    if(and) {
-                        tempPhrase = tempPhrase + " and ";
-                        and = false;
-                    }
-                    else {
+                    if(!and || i == objects.size()-1) {
                         tempPhrase = tempPhrase + ". ";
                         and = true;
                     }
+                    else {
+                        tempPhrase = tempPhrase + " and ";
+                        and = false;
+                    }
                     phrase = phrase + tempPhrase;
                 }
+            }
+            System.out.println(phrase.subSequence(phrase.length()-5,phrase.length()-1));
+            if(phrase.subSequence(phrase.length()-5,phrase.length()-1).equals(" and")) {
+                phrase = phrase.substring(0,phrase.length()-5) + ". ";
             }
             System.out.println(phrase);
             return phrase;
