@@ -92,7 +92,7 @@ public class PhraseGenerator {
          * @return
          */
         private double twoD_center() {
-            return get_center(true) + get_center(false) / 2;
+            return 1 - Math.abs((get_center(true) + get_center(false) / 2) - 0.5);
         }
 
         /**
@@ -118,7 +118,7 @@ public class PhraseGenerator {
     /**
      * used to store best guess of a relationship between two objects
      */
-    private class PrepositionPair {
+    private static class PrepositionPair {
         private int prepositionIndex; //index in prepPhrases array
         private Item adjunct;     //index in objects array
         private Item topic;     //index in objects array
@@ -177,7 +177,7 @@ public class PhraseGenerator {
 
         sortObjects(objects);
 
-        //ppairs = build_preposition_pairs (objects)
+        List<PrepositionPair> ppairs = build_preposition_pairs((Item[])objects.toArray());
 
         // return build_string(objects, ppairs)
         return "This is a test of the Clarify app.";
@@ -241,6 +241,15 @@ public class PhraseGenerator {
             objects.add(newItem);
         }
         return objects;
+    }
+
+    private static List<PrepositionPair> build_preposition_pairs(Item[] objects) {
+        List<PrepositionPair> pairs = new ArrayList<PrepositionPair>();
+        for(int i = 0; i < objects.length; i++){
+            for(int j = i + 1; j < objects.length; j++)
+                pairs.add(new PrepositionPair(objects[i], objects[j]));
+        }
+        return pairs;
     }
 
     //build_preposition_pairs ( Item[] ) > PrepositionPair[]
