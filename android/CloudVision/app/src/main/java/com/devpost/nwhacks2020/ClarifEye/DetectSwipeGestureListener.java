@@ -59,7 +59,6 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
             if(deltaY > 0)
             {
                 // Swipe Up
-                activity.getCameraFile();
             }else
             {
                 // Swipe down
@@ -74,6 +73,7 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
         // Single tap
+        activity.takePhoto();
         return true;
     }
 
@@ -81,7 +81,6 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         // Double tap
-        activity.startCamera();
         return true;
     }
 }

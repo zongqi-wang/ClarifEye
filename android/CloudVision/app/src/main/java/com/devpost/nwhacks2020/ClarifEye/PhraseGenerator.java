@@ -31,8 +31,13 @@ public class PhraseGenerator {
     }
 
     public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
-        String phrase = annotateImageResponse.getTextAnnotations().get(0).getDescription().replaceAll("\n"," ");
-        System.out.println(phrase);
-        return phrase;
+        if(annotateImageResponse.getTextAnnotations() != null) {
+            String phrase = annotateImageResponse.getTextAnnotations().get(0).getDescription().replaceAll("\n", " ");
+            System.out.println(phrase);
+            return phrase;
+        }
+        else {
+            return "No text detected.";
+        }
     }
 }
