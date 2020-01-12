@@ -1,6 +1,7 @@
 package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
+import com.google.api.services.vision.v1.model.EntityAnnotation;
 
 public class PhraseGenerator {
     private String[] prepPhrases = {
@@ -28,8 +29,10 @@ public class PhraseGenerator {
     public static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
         return "";
     }
-    
+
     public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
-        return "";
+        String phrase = annotateImageResponse.getTextAnnotations().get(0).getDescription().replaceAll("\n"," ");
+        System.out.println(phrase);
+        return phrase;
     }
 }
