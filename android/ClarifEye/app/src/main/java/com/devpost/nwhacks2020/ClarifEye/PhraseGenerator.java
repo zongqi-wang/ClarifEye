@@ -149,6 +149,7 @@ public class PhraseGenerator {
             if(topic.sides.left > adjunct.sides.right)
                 scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
 
+            //alternate approach, retained for now
 //            //above
 //            if(adjunct.get_center(false) > topic.get_center(false))
 //                scores[1] = 1 - (adjunct.get_center(false) - topic.get_center(false));
@@ -306,9 +307,14 @@ public class PhraseGenerator {
                     }
                 }
                 if (found) {
-                    if(!pps.contains(ppairs.get(topP))) {
+                    boolean isDup = false;
+                    for(PrepositionPair pair : pps) //check if either topic or adjunct has appeared previously
+                            isDup = pair.topic.equals(ppairs.get(topP).topic)
+                                    || pair.adjunct.equals(ppairs.get(topP).adjunct)
+                                    || pair.topic.equals(ppairs.get(topP).adjunct)
+                                    || pair.adjunct.equals(ppairs.get(topP).topic);
+                    if(!isDup)
                         pps.add(ppairs.get(topP));
-                    }
                 }
             }
             String phrase = "";
@@ -343,7 +349,7 @@ public class PhraseGenerator {
             }
             System.out.println(phrase); //TODO: remove this
             if(phrase.subSequence((phrase.length()-5), phrase.length()).equals(" and ")) {
-                phrase = phrase = phrase.substring(0, phrase.length()-5) + ". ";
+                phrase = phrase.substring(0, phrase.length()-5) + ". ";
             }
             return phrase;
         }
