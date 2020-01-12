@@ -2,6 +2,9 @@ package com.devpost.nwhacks2020.ClarifEye;
 
 import com.google.api.services.vision.v1.model.AnnotateImageResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PhraseGenerator {
     private static String[] prepPhrases = {
             " and ", //generic
@@ -12,6 +15,51 @@ public class PhraseGenerator {
             " in front of ", //distinguish from below
             " behind "       //distinguish from above
     };
+
+
+    /**
+     * used to store objects in image
+     */
+    protected class item{
+        private String name;
+        private int x;
+        private int y;
+        private int prob;
+        private int rel_imp;
+
+        /**
+         * Default constructor
+         */
+        public item() {
+
+
+        }
+
+
+        /**
+         *
+         * @param name label of the object
+         * @param x x position
+         * @param y y position
+         * @param prob probability score
+         */
+        public item(String name, int x, int y, int prob){
+            this.name = name;
+            this.x = x;
+            this.y = y;
+            this.prob = prob;
+        }
+
+        /**
+         * calculates the relative importance of this function
+         */
+        private void setRel_imp(){
+            //TODO:
+        }
+
+
+    }
+
 
     public static String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
         String phrase = "This is a test of the Clarify app.";
@@ -28,6 +76,7 @@ public class PhraseGenerator {
 
     private static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
         //objects = create_objects (annotateImageResponse)
+        List<item> objects = convertJSONtoitem(annotateImageResponse);
 
         //objects = array.sort(objects)
 
@@ -41,12 +90,19 @@ public class PhraseGenerator {
         return "";
     }
 
-    private class item{
-        private item() {
-            //calculate and store importance
-            //overload comparison
-        }
+    /**
+     * This function converts the API returned JSON function into a list of item objects
+     * @param annotateImageResponse response from google cloud API
+     * @return ArrayList of objects in the photo
+     */
+    private static List<item> convertJSONtoitem(AnnotateImageResponse annotateImageResponse){
+        List<item> objects = new ArrayList<item>();
+
+        //TODO: parse JSON file
+        return objects;
     }
+
+
 
     private class prepositionPair{
         private prepositionPair() {
