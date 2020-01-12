@@ -10,7 +10,7 @@ From the very beginning our team knew that we wanted to design something that wo
 ## About The Project
 <i>ClarifEye</i> is specifically designed with accessibility for the visually impaired in mind. We spoke with multiple mentors who have had personal experience with the needs of visually impaired people and how they use mobile phones so that we could best accommodate their needs when developing our application. As a result, <i>ClarifEye</i> places emphasis on audio and haptic cues to aid the user as they interact with the app through extremely simple swiping or tapping gestures. <i>ClarifEye</i> utilizes the power of Google's Cloud Vision API to analyze the current image from the user's camera and synthesizes an audio description of that image through our original algorithm. Additionally, the application provides a text/document reading service to its users using similar computer vision technology.
 
-## Accessible Controls
+## Simple Controls
 
 <pre><code>Swipe Left = Change the mode to Read Document Mode
 Swipe Right = Change the mode to Describe Image Mode
