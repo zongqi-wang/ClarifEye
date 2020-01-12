@@ -31,8 +31,6 @@ import android.os.Vibrator;
 
 import com.camerakit.CameraKitView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.api.services.vision.v1.model.Image;
-
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
