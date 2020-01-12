@@ -300,6 +300,7 @@ public class PhraseGenerator {
                 }
             }
             String phrase = "";
+            boolean and = true;
             for(int i = 0; i < objects.size(); i++) {
                 String tempPhrase = "There is a " + objects.get(i).name;
                 boolean topic = false;
@@ -315,8 +316,15 @@ public class PhraseGenerator {
                     }
 
                 }
-                tempPhrase = tempPhrase + ". ";
                 if(topic) {
+                    if(and) {
+                        tempPhrase = tempPhrase + " and ";
+                        and = false;
+                    }
+                    else {
+                        tempPhrase = tempPhrase + ". ";
+                        and = true;
+                    }
                     phrase = phrase + tempPhrase;
                 }
             }
