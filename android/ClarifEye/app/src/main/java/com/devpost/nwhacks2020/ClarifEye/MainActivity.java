@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private VisionRequestor.Mode mode = VisionRequestor.Mode.DESCRIBE;
     private CameraKitView cameraKitView;
     private Vibrator vibrator;
+    private final Handler handler = new Handler();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -252,15 +256,41 @@ public class MainActivity extends AppCompatActivity {
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
+    private boolean takenPhoto = false;
     public void takePhoto() {
-        vibrate();
-        cameraKitView.captureImage(new  CameraKitView.ImageCallback() {
-            @Override
-            public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
-                // capturedImage contains the image from the CameraKitView.
-                speakImage(capturedImage);
-            }
-        });
+        if(!takenPhoto) {
+            vibrate();
+            takenPhoto = true;
+            Runnable fix = new Runnable() {
+                @Override
+                public void run() {
+                    cameraKitView.onPause();
+                    cameraKitView.onStop();
+                    cameraKitView.onStart();
+                    cameraKitView.onResume();
+                }
+            };
+            Runnable loading = new Runnable() {
+                @Override
+                public void run() {
+                    vibrate();
+                    handler.postDelayed(this, 1000);
+                }
+            };
+            handler.postDelayed(loading, 500);
+            handler.postDelayed(fix, 1000 * 8);
+            cameraKitView.captureImage(new CameraKitView.ImageCallback() {
+                @Override
+                public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
+                    // capturedImage contains the image from the CameraKitView.
+                    speakImage(capturedImage);
+                    takenPhoto = false;
+                    handler.removeCallbacks(fix);
+                    handler.removeCallbacks(loading);
+                }
+            });
+        }
+
     }
 
     private void speakImage(byte[] capturedImage) {
