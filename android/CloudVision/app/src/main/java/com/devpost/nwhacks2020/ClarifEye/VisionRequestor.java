@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -37,8 +38,10 @@ public class VisionRequestor {
     private static final int MAX_LABEL_RESULTS = 10;
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static TextToSpeech tts;
 
-    public static void callCloudVision(final Bitmap bitmap, Activity activity) {
+    public static void callCloudVision(final Bitmap bitmap, Activity activity, TextToSpeech t) {
+        tts = t;
         // Do the real work in an async task, because we need to use the network anyway
         try {
             AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(bitmap, activity));
@@ -63,7 +66,7 @@ public class VisionRequestor {
             try {
                 Log.d(TAG, "created Cloud Vision request object, sending request");
                 BatchAnnotateImagesResponse response = mRequest.execute();
-                return convertResponseToString(response);
+                return convertResponseToAudio(response);
 
             } catch (GoogleJsonResponseException e) {
                 Log.d(TAG, "failed to make API request because " + e.getContent());
@@ -160,22 +163,13 @@ public class VisionRequestor {
         return annotateRequest;
     }
 
-    private static String convertResponseToString(BatchAnnotateImagesResponse response) {
+    private static String convertResponseToAudio(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder("I found these things:\n\n");
 
-        Log.d("VISION",response.getResponses().toString());
+        String phrase = PhraseGenerator.generatePhrase(response.getResponses().get(0));
 
-        List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
-        if (labels != null) {
-            for (EntityAnnotation label : labels) {
-                message.append(String.format(Locale.US, "%.3f: %s", label.getScore(), label.getDescription()));
-                message.append("\n");
-            }
-        } else {
-            message.append("nothing");
-        }
-
-        return message.toString();
+        tts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);
+        return phrase;
     }
 
 

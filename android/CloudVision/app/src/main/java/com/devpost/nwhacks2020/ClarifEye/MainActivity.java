@@ -183,9 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speakImage(Bitmap b) {
-        VisionRequestor.callCloudVision(b,this);
-        String phrase = PhraseGenerator.generatePhrase();
-        tts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);
+        VisionRequestor.callCloudVision(b,this, tts);
     }
 
     private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
