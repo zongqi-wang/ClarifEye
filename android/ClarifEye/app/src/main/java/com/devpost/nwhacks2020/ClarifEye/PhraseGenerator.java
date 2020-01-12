@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PhraseGenerator {
@@ -26,7 +27,7 @@ public class PhraseGenerator {
     /**
      * used to store objects in image
      */
-    protected static class item {
+    protected static class Item implements Comparable<Item>{
         private String name;
         private double[][] vertices; //no tuples in Java :(. First array is x, y coordinates, second is each point in normalizedVertices
         private double prob;
@@ -35,7 +36,7 @@ public class PhraseGenerator {
         /**
          * Default constructor
          */
-        public item() {
+        public Item() {
         }
 
 
@@ -44,7 +45,7 @@ public class PhraseGenerator {
          * @param vertices four given vertices
          * @param prob     probability score
          */
-        public item(String name, double[][] vertices, double prob) {
+        public Item(String name, double[][] vertices, double prob) {
             this.name = name;
             this.vertices = vertices;
             this.prob = prob;
@@ -60,8 +61,12 @@ public class PhraseGenerator {
             this.rel_imp = centering * area;
         }
 
+        public double getRel_imp() {
+            return rel_imp;
+        }
+
         /**
-         * calculates how close the center of the item is to the center of the image
+         * calculates how close the center of the Item is to the center of the image
          * 0.5 is perfectly centered.
          * @param verts
          * @return
@@ -87,18 +92,29 @@ public class PhraseGenerator {
         private double calculate_area(double[][] verts) {
             return 1; //TODO:
         }
+
+
+        public int compareTo(Item compareItem) {
+
+            //ascending order
+            return (int) (getRel_imp() - compareItem.getRel_imp());
+
+            //descending order
+            //return compareQuantity - this.quantity;
+
+        }
     }
 
     /**
      * used to store best guess of a relationship between two objects
      */
-    private class prepositionPair {
+    private class PrepositionPair {
         private int prepositionIndex; //index in prepPhrases array
-        private item adjunct;     //index in objects array
-        private item subject;     //index in objects array TODO: rename variable
+        private Item adjunct;     //index in objects array
+        private Item subject;     //index in objects array TODO: rename variable
         private double score;     //confidence in appropriateness of prepositional phrase
 
-        private prepositionPair() {
+        private PrepositionPair() {
 
 
 
@@ -120,14 +136,18 @@ public class PhraseGenerator {
 
     private static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
         //objects = create_objects (annotateImageResponse)
-        List<item> objects = convertJSONtoitem(annotateImageResponse);
+        List<Item> objects = convertJSONtoitem(annotateImageResponse);
 
-        //objects = array.sort(objects)
+        sortObjects(objects);
 
         //ppairs = build_preposition_pairs (objects)
 
         // return build_string(objects, ppairs)
         return "This is a test of the Clarify app.";
+    }
+
+    private static void sortObjects(List<Item> objects){
+        Collections.sort(objects);
     }
 
     public static String generatePhraseRead(AnnotateImageResponse annotateImageResponse) {
@@ -142,13 +162,13 @@ public class PhraseGenerator {
     }
 
     /**
-     * This function converts the API returned JSON function into a list of item objects
+     * This function converts the API returned JSON function into a list of Item objects
      *
      * @param annotateImageResponse response from google cloud API TODO: update documentation
      * @return ArrayList of objects in the photo
      */
-    private static List<item> convertJSONtoitem(AnnotateImageResponse response){
-        List<item> objects = new ArrayList<item>();
+    private static List<Item> convertJSONtoitem(AnnotateImageResponse response){
+        List<Item> objects = new ArrayList<Item>();
 
         Object r = new JsonParser().parse(response.toString());
         JsonObject parsedResponse = (JsonObject) r;
@@ -169,23 +189,23 @@ public class PhraseGenerator {
                 vertices[1][i] = vertice.get("y").getAsDouble();
             }
 
-            item newItem = new item(name, vertices, score);
+            Item newItem = new Item(name, vertices, score);
             objects.add(newItem);
         }
         return objects;
     }
 
 
-    // create_objects (AnnotateImageResponse > item[])
+    // create_objects (AnnotateImageResponse > Item[])
 
-    // build_preposition_pairs ( item[] ) > prepositionPair[]
-    //foreach i in item.length
-    //compare(item[i], item[i+1])
+    // build_preposition_pairs ( Item[] ) > PrepositionPair[]
+    //foreach i in Item.length
+    //compare(Item[i], Item[i+1])
 
-    //compare(item1, item2) > prepositionPair
+    //compare(item1, item2) > PrepositionPair
 
-    //build_string(item[], prepositionPair[])
-    //foreach(item[])
-    //get best prepositionPair with item[i]
+    //build_string(Item[], PrepositionPair[])
+    //foreach(Item[])
+    //get best PrepositionPair with Item[i]
 }
 
