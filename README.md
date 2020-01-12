@@ -1,5 +1,5 @@
 # ClarifEye
-nwHacks 2020
+Developed at nwHacks 2020 (24 hours)
 
 A mobile application designed to aid the visually impaired by identifying their surroundings as well as reading aloud text from objects or documents.
 
