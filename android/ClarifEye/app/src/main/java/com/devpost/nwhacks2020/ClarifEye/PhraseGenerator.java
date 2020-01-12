@@ -135,12 +135,12 @@ public class PhraseGenerator {
             for(double s : scores)
                 s = 0;
             //and
-            scores[0] = 0.7;
+            scores[0] = 0.4;
             //above
-            if(topic.sides.bottom > adjunct.sides.top)
+            if(topic.sides.bottom < adjunct.sides.top)
                 scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
             //below
-            if(topic.sides.top < adjunct.sides.bottom)
+            if(topic.sides.top > adjunct.sides.bottom)
                 scores[2] = 1 - (adjunct.sides.bottom - topic.sides.top);
             // to the left of
             if(topic.sides.right < adjunct.sides.left)
@@ -150,9 +150,10 @@ public class PhraseGenerator {
                 scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
 
             int topscore = 0;
-            for(int i = 1; i < scores.length; i++)
-                if(scores[i] > scores[topscore])
+            for(int i = 1; i < scores.length; i++) {
+                if (scores[i] > scores[topscore])
                     topscore = i;
+            }
 
             score = scores[topscore];
             prepositionIndex = topscore;
@@ -249,6 +250,7 @@ public class PhraseGenerator {
             sides[2] = Math.max(vertices[0][0], vertices[0][2]);
             sides[3] = Math.min(vertices[0][0], vertices[0][2]);
 
+
             Item newItem = new Item(name, sides, score);
             objects.add(newItem);
         }
@@ -298,8 +300,25 @@ public class PhraseGenerator {
                 }
             }
             String phrase = "";
-            for(int j = 0; j < pps.size(); j++) {
-                phrase = phrase + "There is a " + pps.get(j).topic.name + prepPhrases[pps.get(j).prepositionIndex] + "a " + pps.get(j).adjunct.name + ". ";
+            for(int i = 0; i < objects.size(); i++) {
+                String tempPhrase = "There is a " + objects.get(i).name;
+                boolean topic = false;
+                for (int p = 0; p < pps.size(); p++) {
+                    if (pps.get(p).topic.name.equals(objects.get(i).name)) {
+                        if(topic) {
+                            tempPhrase = tempPhrase + " and";
+                        }
+                        else {
+                            topic = true;
+                        }
+                        tempPhrase = tempPhrase + prepPhrases[pps.get(p).prepositionIndex] + "a " + pps.get(p).adjunct.name;
+                    }
+
+                }
+                tempPhrase = tempPhrase + ". ";
+                if(topic) {
+                    phrase = phrase + tempPhrase;
+                }
             }
             System.out.println(phrase);
             return phrase;
