@@ -20,28 +20,25 @@ public class PhraseGenerator {
     /**
      * used to store objects in image
      */
-    protected class item{
+    protected class item {
         private String name;
-        private int[][] vertices; //no tuples in Java :(. First array is x, y coordinates, second is each point in normalizedVertices
-        private int prob;
-        private int rel_imp;
+        private double[][] vertices; //no tuples in Java :(. First array is x, y coordinates, second is each point in normalizedVertices
+        private double prob;
+        private double rel_imp;
 
         /**
          * Default constructor
          */
         public item() {
-
-
         }
 
 
         /**
-         *
-         * @param name label of the object
+         * @param name     label of the object
          * @param vertices four given vertices
-         * @param prob probability score
+         * @param prob     probability score
          */
-        public item(String name, int[][] vertices, int prob){
+        public item(String name, double[][] vertices, double prob) {
             this.name = name;
             this.vertices = vertices;
             this.prob = prob;
@@ -51,11 +48,30 @@ public class PhraseGenerator {
         /**
          * calculates the relative importance of this function
          */
-        private void setRel_imp(){
-            //TODO:
+        private void setRel_imp() {
+            double center = calculate_center(vertices);
+            double area = 1; //calculate_area(); TODO:
+            this.rel_imp = center * area;
         }
 
-
+        /**
+         * calculates how close the center of the item is to the center of the image
+         * 0.5 is perfectly centered.
+         * @param verts
+         * @return
+         */
+        private double calculate_center(double[][] verts) {
+            double sum = 0;
+            for(double[] dim : verts) {
+                double dimsum = 0;
+                for(double coord : dim)
+                {
+                    dimsum += coord;
+                }
+                sum += dimsum / dim.length;
+            }
+            return sum / verts.length;
+        }
     }
 
 
@@ -90,10 +106,11 @@ public class PhraseGenerator {
 
     /**
      * This function converts the API returned JSON function into a list of item objects
+     *
      * @param annotateImageResponse response from google cloud API
      * @return ArrayList of objects in the photo
      */
-    private static List<item> convertJSONtoitem(AnnotateImageResponse annotateImageResponse){
+    private static List<item> convertJSONtoitem(AnnotateImageResponse annotateImageResponse) {
         List<item> objects = new ArrayList<item>();
 
         //TODO: parse JSON file
@@ -101,8 +118,7 @@ public class PhraseGenerator {
     }
 
 
-
-    private class prepositionPair{
+    private class prepositionPair {
         private prepositionPair() {
             int prepositionIndex;
             int adjunctIndex;
@@ -116,13 +132,13 @@ public class PhraseGenerator {
     // create_objects (AnnotateImageResponse > item[])
 
     // build_preposition_pairs ( item[] ) > prepositionPair[]
-        //foreach i in item.length
-            //compare(item[i], item[i+1])
+    //foreach i in item.length
+    //compare(item[i], item[i+1])
 
     //compare(item1, item2) > prepositionPair
 
     //build_string(item[], prepositionPair[])
-        //foreach(item[])
-            //get best prepositionPair with item[i]
+    //foreach(item[])
+    //get best prepositionPair with item[i]
 }
 
