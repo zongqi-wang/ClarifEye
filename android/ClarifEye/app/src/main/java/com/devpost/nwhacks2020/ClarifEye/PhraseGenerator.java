@@ -18,7 +18,8 @@ public class PhraseGenerator {
             " and ", //generic
             " above ",
             " below ",
-            " beside ",
+            " to the left of ",
+            " to the right of ",
             " with ",        //affects/disregards sentence emphasis
             " in front of ", //distinguish from below
             " behind "       //distinguish from above
@@ -29,19 +30,31 @@ public class PhraseGenerator {
      * used to store objects in image
      */
     protected static class Item implements Comparable<Item>{
+        protected class ItemSides{
+            protected double top;
+            protected double bottom;
+            protected double right;
+            protected double left;
+        }
+
         private String name;
-        private double[][] vertices; //no tuples in Java :(. First array is x, y coordinates, second is each point in normalizedVertices
+        private ItemSides sides;
         private double prob;
         private double rel_imp;
 
         /**
          * @param name     label of the object
-         * @param vertices four given vertices
+         * @param sides    four given sides
          * @param prob     probability score
          */
-        public Item(String name, double[][] vertices, double prob) {
+        public Item(String name, double[] sides, double prob) { //sides = top, bottom, right, left
             this.name = name;
-            this.vertices = vertices;
+
+            this.sides.top = sides[0];
+            this.sides.bottom = sides[1];
+            this.sides.right = sides[2];
+            this.sides.left = sides[3];
+
             this.prob = prob;
             setRel_imp();
         }
@@ -63,32 +76,15 @@ public class PhraseGenerator {
             return rel_imp;
         }
 
-        /**
-         * return the center of the object in the x (0) or y (1) dimension
-         * @param dimension
-         * @return
-         */
-        public double get_center(int dimension)
+        public double get_center(boolean isX)
         {
-            double sum = 0;
-            for(double v : vertices[dimension]){
-                sum += (v / vertices[dimension].length);
-            }
-            return sum;
+           if(isX) return (sides.left + sides.right) / 2;
+           else return (sides.top + sides.bottom) / 2;
         }
 
-        /**
-         * return the width of the object in the x (0) or y (1) dimension
-         * @param dimension
-         * @return
-         */
-        public double get_width(int dimension) {
-            double w = 0;
-            double center = get_center(dimension);
-            for(double v : vertices[dimension]){
-                w += Math.abs((v - center) / 2);
-            }
-            return w;
+        public double get_width(boolean isX) {
+            if(isX) return sides.left - sides.right;
+            else return sides.top - sides.bottom;
         }
 
         /**
@@ -96,8 +92,7 @@ public class PhraseGenerator {
          * @return
          */
         private double twoD_center() {
-            double sum = get_center(0) + get_center(1) / vertices.length;
-            return Math.abs((sum / vertices.length) - 0.5);
+            return get_center(true) + get_center(false) / 2;
         }
 
         /**
@@ -105,7 +100,7 @@ public class PhraseGenerator {
          * @return
          */
         private double calculate_area() {
-            return 1000 * get_width(0) * get_width(1); //multiply by 1000 to avoid issues with insufficient precision
+            return 1000 * get_width(true) * get_width(false); //multiply by 1000 to avoid issues with insufficient precision
         }
 
 
@@ -134,6 +129,32 @@ public class PhraseGenerator {
             this.adjunct = adjunct;
 
             prepositionIndex = 0;
+
+            double[] scores = new double[prepPhrases.length];
+            for(double s : scores)
+                s = 0;
+            //and
+            scores[0] = 0.7;
+            //above
+            if(topic.sides.bottom > adjunct.sides.top)
+                scores[1] = 1 - (topic.sides.bottom - adjunct.sides.top);
+            //below
+            if(topic.sides.top < adjunct.sides.bottom)
+                scores[2] = 1 - (adjunct.sides.bottom - topic.sides.top);
+            // to the left of
+            if(topic.sides.right < adjunct.sides.left)
+                scores[3] = 1 - (adjunct.sides.left - topic.sides.right);
+            //to the right of
+            if(topic.sides.left > adjunct.sides.right)
+                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
+
+            int topscore = 0;
+            for(int i = 1; i < scores.length; i++)
+                if(scores[i] > scores[topscore])
+                    topscore = i;
+
+            score = scores[topscore];
+            prepositionIndex = topscore;
         }
     }
 
@@ -151,7 +172,7 @@ public class PhraseGenerator {
     }
 
     private static String generatePhraseDescribe(AnnotateImageResponse annotateImageResponse) {
-        //objects = create_objects (annotateImageResponse)
+
         List<Item> objects = convertJSONtoitem(annotateImageResponse);
 
         sortObjects(objects);
@@ -196,8 +217,8 @@ public class PhraseGenerator {
             double score = annotation.get("score").getAsDouble();
 
             double[][] vertices = new double[2][];
-            for(double[] v : vertices)
-                v = new double[4];
+            vertices[0] = new double[4]; //x dimension
+            vertices[1] = new double[4]; //y dimension
 
             JsonObject boundingPoly = annotation.get("boundingPoly").getAsJsonObject();
             JsonArray verts = boundingPoly.get("normalizedVertices").getAsJsonArray();
@@ -209,7 +230,14 @@ public class PhraseGenerator {
                 vertices[1][i] = vertice.get("y").getAsDouble();
             }
 
-            Item newItem = new Item(name, vertices, score);
+            double[] sides = new double[4];
+            //the first and third item in the list are always opposite
+            sides[0] = Math.max(vertices[1][0], vertices[1][2]);
+            sides[1] = Math.min(vertices[1][0], vertices[1][2]);
+            sides[2] = Math.max(vertices[0][0], vertices[0][2]);
+            sides[3] = Math.min(vertices[0][0], vertices[0][2]);
+
+            Item newItem = new Item(name, sides, score);
             objects.add(newItem);
         }
         return objects;
