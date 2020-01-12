@@ -37,14 +37,18 @@ public class VisionRequestor {
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
     private static final int MAX_LABEL_RESULTS = 10;
     private static final String TAG = MainActivity.class.getSimpleName();
+    public enum Mode {
+        DESCRIBE,
+        READ
+    }
 
     private static TextToSpeech tts;
 
-    public static void callCloudVision(final Bitmap bitmap, Activity activity, TextToSpeech t) {
+    public static void callCloudVision(final Bitmap bitmap, Activity activity, TextToSpeech t, Mode m) {
         tts = t;
         // Do the real work in an async task, because we need to use the network anyway
         try {
-            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(bitmap, activity));
+            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(bitmap, activity, m),m);
             labelDetectionTask.execute();
         } catch (IOException e) {
             Log.d(TAG, "failed to make API request because of other IOException " +
@@ -55,10 +59,12 @@ public class VisionRequestor {
     private static class LableDetectionTask extends AsyncTask<Object, Void, String> {
         private final WeakReference<Activity> mActivityWeakReference;
         private Vision.Images.Annotate mRequest;
+        private Mode mode;
 
-        LableDetectionTask(Activity activity, Vision.Images.Annotate annotate) {
+        LableDetectionTask(Activity activity, Vision.Images.Annotate annotate, Mode m) {
             mActivityWeakReference = new WeakReference<Activity>(activity);
             mRequest = annotate;
+            mode = m;
         }
 
         @Override
@@ -66,7 +72,7 @@ public class VisionRequestor {
             try {
                 Log.d(TAG, "created Cloud Vision request object, sending request");
                 BatchAnnotateImagesResponse response = mRequest.execute();
-                return convertResponseToAudio(response);
+                return convertResponseToAudio(response, mode);
 
             } catch (GoogleJsonResponseException e) {
                 Log.d(TAG, "failed to make API request because " + e.getContent());
@@ -86,7 +92,7 @@ public class VisionRequestor {
         }
     }
 
-    private static Vision.Images.Annotate prepareAnnotationRequest(Bitmap bitmap, Context context) throws IOException {
+    private static Vision.Images.Annotate prepareAnnotationRequest(Bitmap bitmap, Context context, Mode mode) throws IOException {
         HttpTransport httpTransport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
 
@@ -137,15 +143,25 @@ public class VisionRequestor {
 
                     ArrayList<Feature> features = new ArrayList<Feature>();
 
-                    Feature labelDetection = new Feature();
-                    labelDetection.setType("LABEL_DETECTION");
-                    labelDetection.setMaxResults(MAX_LABEL_RESULTS);
-                    features.add(labelDetection);
+                    switch (mode) {
 
-                    Feature objectDetection = new Feature();
-                    objectDetection.setType("OBJECT_LOCALIZATION");
-                    objectDetection.setMaxResults(MAX_LABEL_RESULTS);
-                    features.add(objectDetection);
+                        case DESCRIBE:
+                            Feature labelDetection = new Feature();
+                            labelDetection.setType("LABEL_DETECTION");
+                            labelDetection.setMaxResults(MAX_LABEL_RESULTS);
+                            features.add(labelDetection);
+
+                            Feature objectDetection = new Feature();
+                            objectDetection.setType("OBJECT_LOCALIZATION");
+                            objectDetection.setMaxResults(MAX_LABEL_RESULTS);
+                            features.add(objectDetection);
+                        case READ:
+                            Feature documentDetection = new Feature();
+                            documentDetection.setType("DOCUMENT_TEXT_DETECTION");
+                            documentDetection.setMaxResults(MAX_LABEL_RESULTS);
+                            features.add(documentDetection);
+                    }
+
 
             annotateImageRequest.setFeatures(features);
 
@@ -163,10 +179,10 @@ public class VisionRequestor {
         return annotateRequest;
     }
 
-    private static String convertResponseToAudio(BatchAnnotateImagesResponse response) {
+    private static String convertResponseToAudio(BatchAnnotateImagesResponse response, Mode mode) {
         StringBuilder message = new StringBuilder("I found these things:\n\n");
 
-        String phrase = PhraseGenerator.generatePhrase(response.getResponses().get(0));
+        String phrase = PhraseGenerator.generatePhrase(response.getResponses().get(0), mode);
 
         tts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);
         return phrase;
