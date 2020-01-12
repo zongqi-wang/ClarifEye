@@ -50,6 +50,7 @@ public class PhraseGenerator {
         public Item(String name, double[] sides, double prob) { //sides = top, bottom, right, left
             this.name = name;
 
+            this.sides = new ItemSides();
             this.sides.top = sides[0];
             this.sides.bottom = sides[1];
             this.sides.right = sides[2];
@@ -159,7 +160,7 @@ public class PhraseGenerator {
     }
 
     public static String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
-        String phrase = "This is a test of the Clarify app.";
+        String phrase = "Nothing has been detected.";
         switch (mode) {
             case DESCRIBE:
                 phrase = generatePhraseDescribe(annotateImageResponse);
