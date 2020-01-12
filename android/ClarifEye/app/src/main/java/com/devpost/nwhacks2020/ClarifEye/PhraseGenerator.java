@@ -150,12 +150,12 @@ public class PhraseGenerator {
 //                scores[4] = 1 - (topic.sides.left - adjunct.sides.right);
 
             //above
-            if(topic.get_center(false) > adjunct.get_center(false))
-                scores[1] = 1 - (topic.get_center(false) - adjunct.get_center(false));
+            if(adjunct.get_center(false) > topic.get_center(false))
+                scores[1] = 1 - (adjunct.get_center(false) - topic.get_center(false));
             else
-                scores[2] = 1 - (adjunct.get_center(false) - topic.get_center(false));
+                scores[2] = 1 - (topic.get_center(false) - adjunct.get_center(false));
             //left
-            if(topic.get_center(true) < adjunct.get_center(true))
+            if(adjunct.get_center(true) > topic.get_center(true))
                 scores[3] = 1 - (adjunct.get_center(true) - topic.get_center(true));
             else
                 scores[4] = 1 - (topic.get_center(true) - adjunct.get_center(true));
