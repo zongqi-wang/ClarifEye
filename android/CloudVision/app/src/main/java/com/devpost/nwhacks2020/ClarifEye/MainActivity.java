@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speakImage(Bitmap b) {
-        VisionRequestor.callCloudVision(b,this, tts);
+        VisionRequestor.callCloudVision(b,this, tts, VisionRequestor.Mode.READ);
     }
 
     private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {

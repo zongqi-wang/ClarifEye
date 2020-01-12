@@ -12,7 +12,7 @@ public class PhraseGenerator {
         " behind "       //distinguish from above
     };
 
-    public static String generatePhrase(AnnotateImageResponse annotateImageResponse) {
+    public static String generatePhrase(AnnotateImageResponse annotateImageResponse, VisionRequestor.Mode mode) {
         return "This is a test of the Clarify app.";
     }
 }
