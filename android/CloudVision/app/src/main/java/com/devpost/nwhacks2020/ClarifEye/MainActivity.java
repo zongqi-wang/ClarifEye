@@ -29,9 +29,12 @@ import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.MotionEventCompat;
 
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
 
-    private TextView mImageDetails;
-    private ImageView mMainImage;
+    private TextView modeText;
     private TextToSpeech tts;
+    private GestureDetectorCompat gestureDetectorCompat;
+    private VisionRequestor.Mode mode = VisionRequestor.Mode.DESCRIBE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR) {
                     int result = tts.setLanguage(Locale.getDefault());
+                    setMode(VisionRequestor.Mode.DESCRIBE);
 
                     if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Toast.makeText(MainActivity.this,
@@ -82,25 +87,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        modeText = (TextView) findViewById(R.id.modeText);
+
+        // Create a common gesture listener object.
+        DetectSwipeGestureListener gestureListener = new DetectSwipeGestureListener();
+
+        // Set activity in the listener.
+        gestureListener.setActivity(this);
+
+        // Create the gesture detector with the gesture listener.
+        gestureDetectorCompat = new GestureDetectorCompat(this, gestureListener);
 
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder
-                    .setMessage(R.string.dialog_select_prompt)
-                    .setPositiveButton(R.string.dialog_select_gallery, (dialog, which) -> startGalleryChooser())
-                    .setNegativeButton(R.string.dialog_select_camera, (dialog, which) -> startCamera());
-            builder.create().show();
-        });
+    }
 
-        mImageDetails = findViewById(R.id.image_details);
-        mMainImage = findViewById(R.id.main_image);
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // Pass activity on touch event to the gesture detector.
+        gestureDetectorCompat.onTouchEvent(event);
+        // Return true to tell android OS that event has been consumed, do not pass it to other event listeners.
+        return true;
+    }
 
-        startCamera();
+    public void setMode(VisionRequestor.Mode m) {
+        mode = m;
+        switch (m){
+
+            case DESCRIBE:
+                modeText.setText("Describe Image");
+                speak("Describe Image");
+                break;
+            case READ:
+                modeText.setText("Read Document");
+                speak("Read Document");
+                break;
+        }
     }
 
     public void startGalleryChooser() {
@@ -172,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                                 MAX_DIMENSION);
 
                 speakImage(bitmap);
-                mMainImage.setImageBitmap(bitmap);
+                //mMainImage.setImageBitmap(bitmap);
 
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
@@ -185,7 +207,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speakImage(Bitmap b) {
-        VisionRequestor.callCloudVision(b,this, tts, VisionRequestor.Mode.READ);
+        VisionRequestor.callCloudVision(b,this, tts, mode);
+    }
+
+    public void speak(String text) {
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {

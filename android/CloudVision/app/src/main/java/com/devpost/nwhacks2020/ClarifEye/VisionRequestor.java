@@ -86,8 +86,7 @@ public class VisionRequestor {
         protected void onPostExecute(String result) {
             Activity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                TextView imageDetail = activity.findViewById(R.id.image_details);
-                imageDetail.setText(result);
+
             }
         }
     }
