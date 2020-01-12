@@ -262,30 +262,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void speakImage(byte[] capturedImage) {
-
+        System.out.println("SPEAK");
         VisionRequestor.callCloudVision(capturedImage,this, tts, mode);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        System.out.println("START");
         cameraKitView.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        System.out.println("RESUME");
         cameraKitView.onResume();
     }
 
     @Override
     protected void onPause() {
         cameraKitView.onPause();
+        System.out.println("PAUSE");
         super.onPause();
     }
 
     @Override
     protected void onStop() {
+        System.out.println("STOP");
         cameraKitView.onStop();
         super.onStop();
     }

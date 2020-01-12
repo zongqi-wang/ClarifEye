@@ -42,17 +42,22 @@ public class VisionRequestor {
         READ
     }
 
+    private static boolean wait = false;
+
     private static TextToSpeech tts;
 
     public static void callCloudVision(final byte[] image, Activity activity, TextToSpeech t, Mode m) {
-        tts = t;
-        // Do the real work in an async task, because we need to use the network anyway
-        try {
-            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(image, activity, m),m);
-            labelDetectionTask.execute();
-        } catch (IOException e) {
-            Log.d(TAG, "failed to make API request because of other IOException " +
-                    e.getMessage());
+        if (!wait) {
+            tts = t;
+            // Do the real work in an async task, because we need to use the network anyway
+            try {
+                AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(activity, prepareAnnotationRequest(image, activity, m), m);
+                labelDetectionTask.execute();
+            } catch (IOException e) {
+                Log.d(TAG, "failed to make API request because of other IOException " +
+                        e.getMessage());
+            }
+            System.out.println("EXECUTED");
         }
     }
 
@@ -173,11 +178,16 @@ public class VisionRequestor {
     }
 
     private static String convertResponseToAudio(BatchAnnotateImagesResponse response, Mode mode) {
+        System.out.println("CONVERT");
         StringBuilder message = new StringBuilder("I found these things:\n\n");
 
         String phrase = PhraseGenerator.generatePhrase(response.getResponses().get(0), mode);
+        System.out.println("PHRASE");
 
         tts.speak(phrase, TextToSpeech.QUEUE_FLUSH, null);
+        System.out.println("SPOKEN");
+        wait = false;
+
         return phrase;
     }
 
