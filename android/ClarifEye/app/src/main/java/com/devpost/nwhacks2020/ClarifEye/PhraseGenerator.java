@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,13 +35,6 @@ public class PhraseGenerator {
         private double rel_imp;
 
         /**
-         * Default constructor
-         */
-        public Item() {
-        }
-
-
-        /**
          * @param name     label of the object
          * @param vertices four given vertices
          * @param prob     probability score
@@ -53,44 +47,65 @@ public class PhraseGenerator {
         }
 
         /**
-         * calculates the relative importance of this function
+         * calculates the relative importance of this item
          */
         private void setRel_imp() {
-            double centering = calculate_center(vertices);
-            double area = calculate_area(vertices);
+            double centering = twoD_center();
+            double area = calculate_area();
             this.rel_imp = centering * area;
         }
 
+        /**
+         * returns the relative importance of this item
+         * @return
+         */
         public double getRel_imp() {
             return rel_imp;
         }
 
         /**
-         * calculates how close the center of the Item is to the center of the image
-         * 0.5 is perfectly centered.
-         * @param verts
+         * return the center of the object in the x (0) or y (1) dimension
+         * @param dimension
          * @return
          */
-        private double calculate_center(double[][] verts) {
+        public double get_center(int dimension)
+        {
             double sum = 0;
-            for(double[] dim : verts) {
-                double dimsum = 0;
-                for(double coord : dim)
-                {
-                    dimsum += coord;
-                }
-                sum += dimsum / dim.length;
+            for(double v : vertices[dimension]){
+                sum += (v / vertices[dimension].length);
             }
-            return sum / verts.length;
+            return sum;
+        }
+
+        /**
+         * return the width of the object in the x (0) or y (1) dimension
+         * @param dimension
+         * @return
+         */
+        public double get_width(int dimension) {
+            double w = 0;
+            double center = get_center(dimension);
+            for(double v : vertices[dimension]){
+                w += Math.abs((v - center) / 2);
+            }
+            return w;
+        }
+
+        /**
+         * calculates how close the center of the Item is to the center of the image
+         * @return
+         */
+        private double twoD_center() {
+            double sum = get_center(0) + get_center(1) / vertices.length;
+            return Math.abs((sum / vertices.length) - 0.5);
         }
 
         /**
          * calculates the area covered by a plane spread between the given vertices
-         * @param verts
          * @return
          */
-        private double calculate_area(double[][] verts) {
-            return 1; //TODO:
+        private double calculate_area() {
+            return 1000 * get_width(0) * get_width(1); //multiply by 1000 to avoid issues with insufficient precision
         }
 
 
@@ -111,13 +126,14 @@ public class PhraseGenerator {
     private class PrepositionPair {
         private int prepositionIndex; //index in prepPhrases array
         private Item adjunct;     //index in objects array
-        private Item subject;     //index in objects array TODO: rename variable
+        private Item topic;     //index in objects array
         private double score;     //confidence in appropriateness of prepositional phrase
 
-        private PrepositionPair() {
+        private PrepositionPair(Item topic, Item adjunct) {
+            this.topic = topic;
+            this.adjunct = adjunct;
 
-
-
+            prepositionIndex = 0;
         }
     }
 
@@ -163,9 +179,8 @@ public class PhraseGenerator {
 
     /**
      * This function converts the API returned JSON function into a list of Item objects
-     *
-     * @param annotateImageResponse response from google cloud API TODO: update documentation
-     * @return ArrayList of objects in the photo
+     * @param response output from vision
+     * @return
      */
     private static List<Item> convertJSONtoitem(AnnotateImageResponse response){
         List<Item> objects = new ArrayList<Item>();
@@ -179,9 +194,14 @@ public class PhraseGenerator {
             JsonObject annotation = a.getAsJsonObject();
             String name = annotation.get("name").getAsString();
             double score = annotation.get("score").getAsDouble();
+
             double[][] vertices = new double[2][];
+            for(double[] v : vertices)
+                v = new double[4];
+
             JsonObject boundingPoly = annotation.get("boundingPoly").getAsJsonObject();
             JsonArray verts = boundingPoly.get("normalizedVertices").getAsJsonArray();
+
             int i = 0;
             for(JsonElement vert : verts) {
                 JsonObject vertice = (JsonObject) vert;
@@ -195,14 +215,9 @@ public class PhraseGenerator {
         return objects;
     }
 
-
-    // create_objects (AnnotateImageResponse > Item[])
-
-    // build_preposition_pairs ( Item[] ) > PrepositionPair[]
+    //build_preposition_pairs ( Item[] ) > PrepositionPair[]
     //foreach i in Item.length
-    //compare(Item[i], Item[i+1])
-
-    //compare(item1, item2) > PrepositionPair
+    //new PrepositionPhrase(Item[i], Item[i+1])
 
     //build_string(Item[], PrepositionPair[])
     //foreach(Item[])
