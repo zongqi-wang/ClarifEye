@@ -1,11 +1,11 @@
 # ClarifEye
 
-A mobile application designed to aid the visually impaired by identifying their surroundings as well as reading aloud text from objects or documents.
+A mobile application designed to aid the visually impaired by verbally identifying their surroundings as well as reading aloud text on objects or documents.
 
 Developed at nwHacks 2020 (24 hrs).
 
 ## Inspiration
-From the very beginning our team knew that we wanted to design something that would help improve people's lives. While brainstorming and discussing possible project ideas, we soon found ourselves gravitating towards the field of computer vision as it was all something we were all interested in learning more about. Through further dicussion, one of our team members shared their personal experience about their grandfather who struggled daily with being visually impaired and at once we all knew what we were going to try to create. The idea of <i>ClarifEye</i> was born.
+From the very beginning our team knew that we wanted to design something that would help improve people's lives. While brainstorming and discussing possible project ideas, we soon found ourselves gravitating towards the field of computer vision as it was a topic we were all interested in exploring. Through further dicussion, one of our team members shared their personal experience about their grandfather who struggled, daily, with being visually impaired, which guided our team to what we were going to try and create. The idea of <i>ClarifEye</i> was born.
 
 ## About The Project
 <i>ClarifEye</i> is specifically designed with accessibility for the visually impaired in mind. We spoke with multiple mentors who have had personal experience with the needs of visually impaired people and how they use mobile phones so that we could best accommodate their needs when developing our application. As a result, <i>ClarifEye</i> places emphasis on audio and haptic cues to aid the user as they interact with the app through extremely simple swiping or tapping gestures. <i>ClarifEye</i> utilizes the power of Google's Cloud Vision API to analyze the current image from the user's camera and synthesizes an audio description of that image through our original algorithm. Additionally, the application provides a text/document reading service to its users using similar computer vision technology.
